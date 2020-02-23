@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:gravity="center"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/buttonSetBase"
+        android:background="@drawable/ic_home_white_70dp"
+        android:layout_width="66dp"
+        android:layout_height="66dp"/>
+
+    <TextView
+        android:text="Base"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="4dp"/>
+
+    <Button
+        android:id="@+id/buttonSetFavorites"
+        android:background="@drawable/ic_star_white_70dp"
+        android:layout_width="66dp"
+        android:layout_height="66dp"/>
+
+    <TextView
+        android:text="Favorites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="4dp"/>
+
+</LinearLayout>

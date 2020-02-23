@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:padding="8dp"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:contentDescription="@string/currency_flag"
+        android:id="@+id/imageViewFlag"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewCurrencyCode"
+        android:textColor="@color/white"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintTop_toTopOf="@id/imageViewFlag"
+        app:layout_constraintStart_toEndOf="@id/imageViewFlag"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewFlag"/>
+
+    <TextView
+        android:id="@+id/textViewConversionAmount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/textViewCurrencyCode"
+        app:layout_constraintTop_toTopOf="@id/textViewCurrencyCode" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
