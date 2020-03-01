@@ -1,4 +1,4 @@
-package com.example.moolamoneyconverter;
+package com.example.moolamoneyconverter.activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,9 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.moolamoneyconverter.adapters.CurrencyRecycleViewAdapter;
+import com.example.moolamoneyconverter.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +70,7 @@ public class CurrencySelectorActivity extends WearableActivity  implements Curre
 
         RecyclerView.LayoutManager manager = new LinearLayoutManager(this);
         recyclerViewCurrencies.setLayoutManager(manager);
-        CurrencyRecycleViewAdapter adapter = new CurrencyRecycleViewAdapter(currencyCodes, id, this);
+        CurrencyRecycleViewAdapter adapter = new CurrencyRecycleViewAdapter(currencyCodes, id, this, null);
         recyclerViewCurrencies.setAdapter(adapter);
 
         buttonSave = findViewById(R.id.buttonSaveBase);

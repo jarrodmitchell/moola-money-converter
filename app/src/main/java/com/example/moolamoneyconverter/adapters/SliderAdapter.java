@@ -1,45 +1,47 @@
-package com.example.moolamoneyconverter;
+package com.example.moolamoneyconverter.adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Configuration;
-import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 
+import com.example.moolamoneyconverter.R;
+import com.example.moolamoneyconverter.adapters.CurrencyRecycleViewAdapter;
+import com.example.moolamoneyconverter.utilities.NetworkUtility;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class SliderAdapter  extends PagerAdapter {
 
-    interface OpenSelectorActivityListener {
+    public interface OpenSelectorActivityListener {
         void openSelectorActivity(int id);
     }
 
-    OpenSelectorActivityListener openSelectorActivityListener;
+    private OpenSelectorActivityListener openSelectorActivityListener;
     private Context context;
     private ArrayList<String> currencies;
     private String base;
+    private ArrayList<BigDecimal> convertedAmounts = null;
 
-    SliderAdapter(Context context, ArrayList<String> currencies, String base) {
+    public SliderAdapter(Context context, ArrayList<String> currencies, String base, ArrayList<BigDecimal> convertedAmounts) {
         this.context = context;
         this.currencies = currencies;
         this.base = base;
         if (context instanceof OpenSelectorActivityListener) {
             openSelectorActivityListener = (OpenSelectorActivityListener) context;
+        }
+        if (convertedAmounts != null) {
+            this.convertedAmounts = convertedAmounts;
         }
     }
 
@@ -61,6 +63,7 @@ public class SliderAdapter  extends PagerAdapter {
 
         if (layoutInflater != null) {
             switch (position) {
+
                 case 0:
                     View view0 = layoutInflater.inflate(R.layout.list_slide_layout, container, false);
                     final RecyclerView recyclerViewCurrencies = view0.findViewById(R.id.recyclerViewCurrencies);
@@ -71,7 +74,7 @@ public class SliderAdapter  extends PagerAdapter {
                         textViewEmptyList.setVisibility(View.GONE);
                         RecyclerView.LayoutManager manager = new LinearLayoutManager(context);
                         recyclerViewCurrencies.setLayoutManager(manager);
-                        CurrencyRecycleViewAdapter adapter = new CurrencyRecycleViewAdapter(currencies, 0, context);
+                        CurrencyRecycleViewAdapter adapter = new CurrencyRecycleViewAdapter(currencies, 0, context, convertedAmounts);
                         recyclerViewCurrencies.setAdapter(adapter);
                     }else{
                         recyclerViewCurrencies.setVisibility(View.GONE);
@@ -86,12 +89,21 @@ public class SliderAdapter  extends PagerAdapter {
                     View view1 = layoutInflater.inflate(R.layout.settings_slide_layout, container, false);
 
                     Button buttonBase = view1.findViewById(R.id.buttonSetBase);
-                    buttonBase.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            openSelectorActivityListener.openSelectorActivity(1);
-                        }
-                    });
+                    if (NetworkUtility.checkNetworkConnectivity(context)) {
+                        buttonBase.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                openSelectorActivityListener.openSelectorActivity(1);
+                            }
+                        });
+                    }else {
+                        buttonBase.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(context, "Network Connection needed to change base currency", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
 
                     Button buttonFavorites = view1.findViewById(R.id.buttonSetFavorites);
                     buttonFavorites.setOnClickListener(new View.OnClickListener() {
