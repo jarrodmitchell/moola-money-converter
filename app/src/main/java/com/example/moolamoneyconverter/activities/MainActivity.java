@@ -1,17 +1,22 @@
 package com.example.moolamoneyconverter.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.moolamoneyconverter.GetConversionAsyncTask;
 import com.example.moolamoneyconverter.adapters.CurrencyRecycleViewAdapter;
 import com.example.moolamoneyconverter.utilities.JSONUtility;
+import com.example.moolamoneyconverter.utilities.LocationUtility;
 import com.example.moolamoneyconverter.utilities.NetworkUtility;
 import com.example.moolamoneyconverter.R;
 import com.example.moolamoneyconverter.adapters.SliderAdapter;
@@ -53,6 +58,7 @@ public class MainActivity extends WearableActivity implements
 
     public static final String FILE_NAME = "exchange_rates";
     public static final String TAG = "MainActivity";
+    private static final int PERMISSION_REQUEST_CODE = 1;
 
     private File getFile() {
         return new File(getFilesDir(), FILE_NAME+".json");
@@ -101,6 +107,7 @@ public class MainActivity extends WearableActivity implements
 
     public ArrayList<BigDecimal> convertedAmounts = null;
     public ArrayList<String> favoriteCurrencies = new ArrayList<>();
+    public String locationCurrency = null;
     public String baseCurrency = null;
     public String baseAmount = null;
 
@@ -113,7 +120,16 @@ public class MainActivity extends WearableActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if ()
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED) {
+                locationCurrency = LocationUtility.getLocation(this);
+                if (locationCurrency != null)  {
+                    favoriteCurrencies.add(locationCurrency);
+                }
+            }else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
+            }
+        }
 
         // Enables Always-on
         setAmbientEnabled();
@@ -183,6 +199,9 @@ public class MainActivity extends WearableActivity implements
                     //new fave currencies saved
                 case REQUEST_OPEN_SELECTOR_ACTIVITY_FOR_FAVORITES:
                     favoriteCurrencies = data.getStringArrayListExtra(CurrencySelectorActivity.EXTRA_FAVORITE_CURRENCIES);
+                    if (locationCurrency != null && favoriteCurrencies != null) {
+                        favoriteCurrencies.add(locationCurrency);
+                    }
                     if (favoriteCurrencies != null) {
                         loadPager();
                         //clear conversions when the favorites are changed

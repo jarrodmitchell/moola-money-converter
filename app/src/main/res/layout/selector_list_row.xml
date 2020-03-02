@@ -10,10 +10,14 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:contentDescription="@string/currency_flag"
         android:id="@+id/imageViewFlag"
-        android:layout_width="20dp"
+        android:layout_width="40dp"
         android:layout_height="20dp"
+        android:contentDescription="@string/currency_flag"
+        android:scaleType="centerCrop"
+
+        android:paddingStart="0dp"
+        android:paddingEnd="12dp"
 
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

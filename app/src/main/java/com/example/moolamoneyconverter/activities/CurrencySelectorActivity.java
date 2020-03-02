@@ -45,9 +45,10 @@ public class CurrencySelectorActivity extends WearableActivity  implements Curre
     }
 
     int id = 0;
-    ArrayList<String> currencyCodes = new ArrayList<String>(Arrays.asList("CAD", "HKD", "ISK", "PHP", "DKK", "HUF", "CZK", "GBP", "RON", "SEK", "IDR",
+    ArrayList<String> currencyCodes = new ArrayList<String>(Arrays.asList(
+            "CAD", "HKD", "ISK", "PHP", "DKK", "HUF", "CZK", "GBP", "RON", "SEK", "IDR",
             "INR", "BRL", "RUB", "HRK", "JPY", "THB", "CHF", "EUR", "MYR", "BGN", "TRY",
-            "CNY", "NOK", "NZD", "ZAR", "USD", "MXN", "SGD", "AUD", "ILS", "KRW", "PLN"));
+            "CNY", "NOK", "NZD", "ZAR", "USD", "MXN", "SGD", "AUD", "ILS", "KRW", "PLN", ""));
 
     Context context;
     String currencyCode;
@@ -87,10 +88,10 @@ public class CurrencySelectorActivity extends WearableActivity  implements Curre
 
         switch (id)  {
             case 1:
-
-                Log.d("return",  currencyCode);
+                //return selected base currency
                 returnIntent.putExtra(EXTRA_BASE_CURRENCY, currencyCode);
             case  2:
+                //return selected favorite currencies
                 returnIntent.putExtra(EXTRA_FAVORITE_CURRENCIES, selectedCurrencies);
         }
 

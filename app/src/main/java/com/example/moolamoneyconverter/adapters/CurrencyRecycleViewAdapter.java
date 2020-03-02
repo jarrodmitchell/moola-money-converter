@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moolamoneyconverter.R;
@@ -83,17 +84,20 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //determine what list to show
+        //show currency list for main activity
         if (id == 0 && currencies != null && !currencies.isEmpty()) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.currency_list_row, parent, false);
             view.setClickable(true);
-            return new CurrencyViewHolder(view);
+            return new CurrencyViewHolder(view, context);
         }
+        //show selector list when selecting base and favorite currencies
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.selector_list_row, parent, false);
         view.setClickable(true);
 
-        return new CurrencyViewHolder(view);
+        return new CurrencyViewHolder(view, context);
     }
 
     @Override
@@ -103,11 +107,13 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
         if (convertedAmounts != null && position < convertedAmounts.size()) {
              amount = convertedAmounts.get(position);
         }
+
         currencyHolder.setViewDetails(currencies.get(position), amount);
 
-        switch (id) {
 
-            case 0:
+        switch (id) {
+            //set on click listener for the main activity list
+            case 0://prompt user to enter an amount to convert
                 currencyHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -131,17 +137,17 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
                         alert.show();
                         notifyDataSetChanged();
                     }
-                });
+                });//For long press; prompt user to remove a currency
                 currencyHolder.itemView.setLongClickable(true);
                 currencyHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                        alert.setTitle("Delete Currency");
+                        alert.setTitle("Remove Currency");
                         final TextView currencyCode = v.findViewById(R.id.textViewCurrencyCode);
                         alert.setMessage(currencyCode.getText().toString());
-                        alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        alert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                Log.d(TAG, "onClick: Delete currency" + currencyCode.getText().toString());
+                                Log.d(TAG, "onClick: Remove currency" + currencyCode.getText().toString());
                                 deleteCurrencyListener.deleteCurrency(currencyCode.getText().toString());
                             }
                         });
@@ -153,8 +159,9 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
                 });
                 break;
 
+                //set on click listen for choosing a base currency
             case 1:
-
+                //display  the save button when a currency is selected //highlight selected currency
                 currencyHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -166,6 +173,10 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
                     }
                 });
 
+                if (position == currencies.size() -1 ) {
+                    holder.itemView.setClickable(false);
+                }
+
                 if (index == position) {
                     holder.itemView.setBackgroundColor(Color.BLUE);
                 }else {
@@ -173,8 +184,9 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
                 }
                 break;
 
+                //set on click listener for selecting favorite currencies
             case 2:
-
+                //display or hide save button depending on the number of selected currencies //highlight selected currencies
                 currencyHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -203,6 +215,10 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
 
                 String code = ((TextView)holder.itemView.findViewById(R.id.textViewCurrencyCode)).getText().toString();
 
+                if (position == currencies.size() -1 ) {
+                    holder.itemView.setClickable(false);
+                }
+
                 if (favorites.contains(code)) {
                     holder.itemView.setBackgroundColor(Color.RED);
                 }else{
@@ -223,18 +239,32 @@ class CurrencyViewHolder extends RecyclerView.ViewHolder {
     private ImageView imageViewFlag;
     private TextView textViewCurrencyCode;
     private TextView textViewConversionAmount;
+    private Context context;
 
-    CurrencyViewHolder(@NonNull final View itemView) {
+    CurrencyViewHolder(@NonNull final View itemView, Context context) {
         super(itemView);
+
         imageViewFlag =  itemView.findViewById(R.id.imageViewFlag);
         textViewCurrencyCode = itemView.findViewById(R.id.textViewCurrencyCode);
         textViewConversionAmount =  itemView.findViewById(R.id.textViewConversionAmount);
+        this.context = context;
     }
 
+    //set view details
     void setViewDetails(String currencyCode, BigDecimal amount)  {
         textViewCurrencyCode.setText(currencyCode);
         if (amount != null && textViewConversionAmount != null) {
             textViewConversionAmount.setText(amount.toPlainString());
+        }
+        if (currencyCode.equals("")) {
+            imageViewFlag.setImageDrawable(null);
+
+        }else{
+            if (currencyCode.equals("TRY")) {
+                currencyCode += "2";
+            }
+            Log.d("H", "setViewDetails: " + currencyCode);
+            imageViewFlag.setImageDrawable((ContextCompat.getDrawable(context, context.getResources().getIdentifier(currencyCode.toLowerCase(), "drawable", context.getPackageName()))));
         }
     }
 }

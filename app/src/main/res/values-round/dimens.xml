@@ -5,6 +5,6 @@
 
     <dimen name="inner_frame_layout_padding">5dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="list_item_padding_start_end">40dp</dimen>
-    <dimen name="list_item_padding_top_bottom">15dp</dimen>
+    <dimen name="list_item_padding_start_end">50dp</dimen>
+    <dimen name="list_item_padding_top_bottom">18dp</dimen>
 </resources>

@@ -21,7 +21,8 @@
             <ImageView
                 android:contentDescription="@string/currency_flag"
                 android:id="@+id/baseImageViewFlag"
-                android:layout_width="20dp"
+                android:scaleType="centerCrop"
+                android:layout_width="40dp"
                 android:layout_height="20dp"/>
 
             <TextView

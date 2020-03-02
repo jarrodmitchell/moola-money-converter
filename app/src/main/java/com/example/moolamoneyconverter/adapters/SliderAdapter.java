@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
@@ -69,6 +70,7 @@ public class SliderAdapter  extends PagerAdapter {
         if (layoutInflater != null) {
             switch (position) {
 
+                //inflate main screen with currency list
                 case 0:
 
                     View view0 = layoutInflater.inflate(R.layout.list_slide_layout, container, false);
@@ -79,6 +81,7 @@ public class SliderAdapter  extends PagerAdapter {
                     TextView textViewNoBase = view0.findViewById(R.id.textViewNoBaseCurrency);
                     TextView textViewBaseCurrencyCode = view0.findViewById(R.id.baseTextViewCurrencyCode);
 
+                    //populate views if values are present
                     if (currencies.size() > 0 && base != null) {
                         ImageView imageViewFlag = view0.findViewById(R.id.baseImageViewFlag);
                         TextView textViewBaseAmount = view0.findViewById(R.id.baseTextViewConversionAmount);
@@ -86,10 +89,13 @@ public class SliderAdapter  extends PagerAdapter {
                         if (baseAmount != null) {
                             textViewBaseAmount.setText(baseAmount);
                         }
-
                         baseCurrencyLayout.setVisibility(View.VISIBLE);
                         textViewNoBase.setVisibility(View.GONE);
                         textViewBaseCurrencyCode.setText(base);
+                        if (base.equals("TRY")) {
+                            base += "2";
+                        }
+                        imageViewFlag.setImageDrawable((ContextCompat.getDrawable(context, context.getResources().getIdentifier(base.toLowerCase(), "drawable", context.getPackageName()))));
 
                         recyclerViewCurrencies.setVisibility(View.VISIBLE);
                         textViewEmptyList.setVisibility(View.GONE);
@@ -115,10 +121,13 @@ public class SliderAdapter  extends PagerAdapter {
                     return view0;
 
 
+                    //inflate settings screen with buttons to select base or favorite currencies
                 case 1:
 
                     View view1 = layoutInflater.inflate(R.layout.settings_slide_layout, container, false);
 
+                    //Base currency can only be changed when there is a network connection
+                    //when the buttons are tapped they will open the selector activity
                     Button buttonBase = view1.findViewById(R.id.buttonSetBase);
                     if (NetworkUtility.checkNetworkConnectivity(context)) {
                         buttonBase.setOnClickListener(new View.OnClickListener() {
@@ -127,11 +136,11 @@ public class SliderAdapter  extends PagerAdapter {
                                 openSelectorActivityListener.openSelectorActivity(1);
                             }
                         });
-                    }else {
+                    }else {//inform user
                         buttonBase.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Toast.makeText(context, "Network Connection needed to change base currency", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, "Network Connection needed to change base currency", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
