@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,13 +31,17 @@ public class SliderAdapter  extends PagerAdapter {
     private OpenSelectorActivityListener openSelectorActivityListener;
     private Context context;
     private ArrayList<String> currencies;
-    private String base;
+    private String base = null;
+    private String baseAmount = null;
     private ArrayList<BigDecimal> convertedAmounts = null;
 
-    public SliderAdapter(Context context, ArrayList<String> currencies, String base, ArrayList<BigDecimal> convertedAmounts) {
+    public SliderAdapter(Context context, ArrayList<String> currencies, String base, String baseAmount, ArrayList<BigDecimal> convertedAmounts) {
         this.context = context;
         this.currencies = currencies;
         this.base = base;
+        if (baseAmount != null) {
+            this.baseAmount = baseAmount;
+        }
         if (context instanceof OpenSelectorActivityListener) {
             openSelectorActivityListener = (OpenSelectorActivityListener) context;
         }
@@ -65,20 +70,46 @@ public class SliderAdapter  extends PagerAdapter {
             switch (position) {
 
                 case 0:
+
                     View view0 = layoutInflater.inflate(R.layout.list_slide_layout, container, false);
                     final RecyclerView recyclerViewCurrencies = view0.findViewById(R.id.recyclerViewCurrencies);
                     TextView textViewEmptyList = view0.findViewById(R.id.textViewEmptyCurrencyList);
 
+                    final LinearLayout baseCurrencyLayout = view0.findViewById(R.id.linearLayoutBaseCurrency);
+                    TextView textViewNoBase = view0.findViewById(R.id.textViewNoBaseCurrency);
+                    TextView textViewBaseCurrencyCode = view0.findViewById(R.id.baseTextViewCurrencyCode);
+
                     if (currencies.size() > 0 && base != null) {
+                        ImageView imageViewFlag = view0.findViewById(R.id.baseImageViewFlag);
+                        TextView textViewBaseAmount = view0.findViewById(R.id.baseTextViewConversionAmount);
+
+                        if (baseAmount != null) {
+                            textViewBaseAmount.setText(baseAmount);
+                        }
+
+                        baseCurrencyLayout.setVisibility(View.VISIBLE);
+                        textViewNoBase.setVisibility(View.GONE);
+                        textViewBaseCurrencyCode.setText(base);
+
                         recyclerViewCurrencies.setVisibility(View.VISIBLE);
                         textViewEmptyList.setVisibility(View.GONE);
                         RecyclerView.LayoutManager manager = new LinearLayoutManager(context);
                         recyclerViewCurrencies.setLayoutManager(manager);
                         CurrencyRecycleViewAdapter adapter = new CurrencyRecycleViewAdapter(currencies, 0, context, convertedAmounts);
                         recyclerViewCurrencies.setAdapter(adapter);
-                    }else{
+
+                    }
+                    if (currencies.size() == 0) {
                         recyclerViewCurrencies.setVisibility(View.GONE);
                         textViewEmptyList.setVisibility(View.VISIBLE);
+                    }
+                    if (base == null) {
+                        baseCurrencyLayout.setVisibility(View.GONE);
+                        textViewNoBase.setVisibility(View.VISIBLE);
+                    }else {
+                        baseCurrencyLayout.setVisibility(View.VISIBLE);
+                        textViewNoBase.setVisibility(View.GONE);
+                        textViewBaseCurrencyCode.setText(base);
                     }
                     container.addView(view0);
                     return view0;

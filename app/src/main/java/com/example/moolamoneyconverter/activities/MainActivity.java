@@ -23,12 +23,31 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
-public class MainActivity extends WearableActivity implements MenuItem.OnMenuItemClickListener, SliderAdapter.OpenSelectorActivityListener, GetConversionAsyncTask.SaveJSONToFileListener, CurrencyRecycleViewAdapter.SaveAmountListener {
+public class MainActivity extends WearableActivity implements
+        MenuItem.OnMenuItemClickListener,
+        SliderAdapter.OpenSelectorActivityListener,
+        GetConversionAsyncTask.SaveJSONToFileListener,
+        CurrencyRecycleViewAdapter.SaveAmountListener,
+        CurrencyRecycleViewAdapter.DeleteCurrencyListener{
+
+    @Override
+    public void deleteCurrency(String currencyCode) {
+        //remove the selected currency and its corresponding amount from lists
+        int index = favoriteCurrencies.indexOf(currencyCode);
+        favoriteCurrencies.remove(currencyCode);
+        if (convertedAmounts != null) {
+            convertedAmounts.remove(index);
+        }
+        loadPager();
+    }
 
     @Override
     public void saveAmount(BigDecimal amount) {
+        //update vies with converted amounts
         convertedAmounts = JSONUtility.getConversions(favoriteCurrencies, amount);
-        Log.d(TAG, "saveAmount: " + convertedAmounts.toString());
+        if (convertedAmounts != null) {
+            baseAmount = convertedAmounts.remove(convertedAmounts.size() - 1).toPlainString();
+        }
         loadPager();
     }
 
@@ -50,17 +69,13 @@ public class MainActivity extends WearableActivity implements MenuItem.OnMenuIte
     @Override
     public void saveJSON(String data) {
         if (data  != null) {
-            try {
+            try {//write currency conversion rates to json file
                 FileWriter fileWriter = new FileWriter(getFile());
-                Log.d(TAG, "saveJSON: " + data);
-
-                Log.d(TAG, "saveJSON: " + getFile().getAbsolutePath());
                 fileWriter.write(data);
                 fileWriter.close();
             }catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
@@ -68,9 +83,11 @@ public class MainActivity extends WearableActivity implements MenuItem.OnMenuIte
     public void openSelectorActivity(int id) {
         Intent intent = new Intent(this, CurrencySelectorActivity.class);
         intent.putExtra(EXTRA_ID, id);
+        //open selector activity to retrieve base currency
         if (id == 1) {
             startActivityForResult(intent, REQUEST_OPEN_SELECTOR_ACTIVITY_FOR_BASE);
         }else{
+            //open selector to retrieve favorite currencies
             startActivityForResult(intent, REQUEST_OPEN_SELECTOR_ACTIVITY_FOR_FAVORITES);
         }
     }
@@ -84,7 +101,8 @@ public class MainActivity extends WearableActivity implements MenuItem.OnMenuIte
 
     public ArrayList<BigDecimal> convertedAmounts = null;
     public ArrayList<String> favoriteCurrencies = new ArrayList<>();
-    public String baseCurrency = "PHP";
+    public String baseCurrency = null;
+    public String baseAmount = null;
 
     GetConversionAsyncTask getConversionAsyncTask;
 
@@ -94,6 +112,8 @@ public class MainActivity extends WearableActivity implements MenuItem.OnMenuIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if ()
 
         // Enables Always-on
         setAmbientEnabled();
@@ -105,50 +125,44 @@ public class MainActivity extends WearableActivity implements MenuItem.OnMenuIte
         checkNetworkConnection();
     }
 
+    //check for network connection and saved data before loading view pager
     private void checkNetworkConnection() {
+        //if there is no network connection check for file
         if (!NetworkUtility.checkNetworkConnectivity(this)) {
             if (getFile().isFile()) {
                 try {
                     //convert input stream to string
                     String jsonString = new String(Files.readAllBytes(getFile().toPath()));
                     if (!jsonString.isEmpty()) {
-                        JSONUtility.getJsonFromString(jsonString);
+                        String base = JSONUtility.getJsonFromString(jsonString);
+                        if (base != null) {
+                            baseCurrency  = base;
+                        }
                         loadPager();
                     }
 
                 }catch (IOException e) {
                     e.printStackTrace();
                 }
-            }else{
+            }else{//if there is no connection or saved data, request network access
                 NetworkUtility.requestNetworkAccess(this);
             }
-        }else {
-            Log.d(TAG, "checkNetworkConnection: load pager");
+        }else {//if so, load view pager
             loadPager();
         }
     }
 
+    //pass currency data to view pager
     private void loadPager() {
+        //if a base currency is selected, attempt to get updated conversion data
         if (baseCurrency != null)  {
             if (NetworkUtility.checkNetworkConnectivity(this)) {
                 getConversionAsyncTask = new GetConversionAsyncTask(this);
                 getConversionAsyncTask.execute(baseCurrency);
             }
-
-            if (!favoriteCurrencies.contains(baseCurrency) && favoriteCurrencies.size() > 0) {
-
-                favoriteCurrencies.remove(baseCurrency);
-
-                String holder = favoriteCurrencies.get(0);
-
-                favoriteCurrencies.set(0, baseCurrency);
-
-                favoriteCurrencies.add(holder);
-            }
         }
         ViewPager viewPager = findViewById(R.id.slideViewPager);
-        LinearLayout dotLayout = findViewById(R.id.linearLayoutDot);
-        SliderAdapter sliderAdapter = new SliderAdapter(this, favoriteCurrencies, baseCurrency, convertedAmounts);
+        SliderAdapter sliderAdapter = new SliderAdapter(this, favoriteCurrencies, baseCurrency, baseAmount, convertedAmounts);
         viewPager.setAdapter(sliderAdapter);
     }
 
@@ -161,16 +175,19 @@ public class MainActivity extends WearableActivity implements MenuItem.OnMenuIte
                 //new base currency saved
                 case REQUEST_OPEN_SELECTOR_ACTIVITY_FOR_BASE:
                     baseCurrency = data.getStringExtra(CurrencySelectorActivity.EXTRA_BASE_CURRENCY);
-                    if (baseCurrency != null) {
-                        loadPager();
-                    }
+                    //clear conversions when base is changed
+                    convertedAmounts = null;
+                    baseAmount = null;
+                    loadPager();
                     break;
                     //new fave currencies saved
                 case REQUEST_OPEN_SELECTOR_ACTIVITY_FOR_FAVORITES:
                     favoriteCurrencies = data.getStringArrayListExtra(CurrencySelectorActivity.EXTRA_FAVORITE_CURRENCIES);
                     if (favoriteCurrencies != null) {
                         loadPager();
+                        //clear conversions when the favorites are changed
                         convertedAmounts = null;
+                        baseAmount = null;
                     }
                     break;
             }

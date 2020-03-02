@@ -36,13 +36,18 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
         void saveAmount(BigDecimal amount);
     }
 
-    private ArrayList<String> currencies;
+    public interface DeleteCurrencyListener {
+        void deleteCurrency(String currencyCode);
+    }
+
+    private ArrayList<String> currencies = null;
     private String base;
     private ArrayList<String> favorites;
     private int id;
     private Context context;
     private DipslaySaveButtonListener dipslaySaveButtonListener;
     private SaveAmountListener saveAmountListener;
+    private DeleteCurrencyListener deleteCurrencyListener;
     private ArrayList<BigDecimal> convertedAmounts = null;
 
 
@@ -67,6 +72,9 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
         if (context instanceof SaveAmountListener) {
             saveAmountListener = (SaveAmountListener) context;
         }
+        if (context instanceof DeleteCurrencyListener) {
+            this.deleteCurrencyListener = (DeleteCurrencyListener) context;
+        }
         if (convertedAmounts != null) {
             this.convertedAmounts = convertedAmounts;
         }
@@ -75,9 +83,14 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (id == 0 && currencies != null && !currencies.isEmpty()) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.currency_list_row, parent, false);
+            view.setClickable(true);
+            return new CurrencyViewHolder(view);
+        }
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.currency_list_row, parent, false);
-
+                .inflate(R.layout.selector_list_row, parent, false);
         view.setClickable(true);
 
         return new CurrencyViewHolder(view);
@@ -117,6 +130,25 @@ public class CurrencyRecycleViewAdapter extends RecyclerView.Adapter {
                         alert.setNegativeButton("Cancel", null);
                         alert.show();
                         notifyDataSetChanged();
+                    }
+                });
+                currencyHolder.itemView.setLongClickable(true);
+                currencyHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                        alert.setTitle("Delete Currency");
+                        final TextView currencyCode = v.findViewById(R.id.textViewCurrencyCode);
+                        alert.setMessage(currencyCode.getText().toString());
+                        alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                Log.d(TAG, "onClick: Delete currency" + currencyCode.getText().toString());
+                                deleteCurrencyListener.deleteCurrency(currencyCode.getText().toString());
+                            }
+                        });
+                        alert.setNegativeButton("Cancel", null);
+                        alert.show();
+                        notifyDataSetChanged();
+                        return true;
                     }
                 });
                 break;
@@ -201,7 +233,7 @@ class CurrencyViewHolder extends RecyclerView.ViewHolder {
 
     void setViewDetails(String currencyCode, BigDecimal amount)  {
         textViewCurrencyCode.setText(currencyCode);
-        if (amount != null) {
+        if (amount != null && textViewConversionAmount != null) {
             textViewConversionAmount.setText(amount.toPlainString());
         }
     }

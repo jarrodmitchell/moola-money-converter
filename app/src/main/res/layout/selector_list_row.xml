@@ -29,16 +29,5 @@
         app:layout_constraintStart_toEndOf="@id/imageViewFlag"
         app:layout_constraintBottom_toBottomOf="@id/imageViewFlag"/>
 
-    <TextView
-        android:id="@+id/textViewConversionAmount"
-        android:textColor="@color/green"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/imageViewFlag"
-        app:layout_constraintTop_toBottomOf="@id/imageViewFlag" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

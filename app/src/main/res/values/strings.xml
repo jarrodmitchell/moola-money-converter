@@ -9,5 +9,7 @@
     <string name="title_activity_currency_selector">CurrencySelectorActivity</string>
     <string name="button_save">Save</string>
     <string name="empty_message">Swipe left to \nadd currencies</string>
-    <string name="no_base_message">Swipe left to \nset base currency</string>
+    <string name="pick_base_message">Swipe left to \npick base currency</string>
+    <string name="button_favorites_label">Favorites</string>
+    <string name="button_base_label">Base</string>
 </resources>

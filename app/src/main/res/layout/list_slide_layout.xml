@@ -1,7 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/linearLayoutBaseCurrency"
+        android:paddingTop="@dimen/list_item_padding_top_bottom"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:contentDescription="@string/currency_flag"
+                android:id="@+id/baseImageViewFlag"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+            <TextView
+                android:id="@+id/baseTextViewCurrencyCode"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/baseTextViewConversionAmount"
+            android:textAlignment="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/green" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewNoBaseCurrency"
+        android:text="@string/pick_base_message"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textAlignment="center"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCurrencies"
@@ -12,10 +69,11 @@
     <TextView
         android:id="@+id/textViewEmptyCurrencyList"
         android:text="@string/empty_message"
+        android:layout_marginTop="20dp"
         android:gravity="center"
         android:textAlignment="center"
         android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
